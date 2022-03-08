@@ -1,3 +1,5 @@
+require('./pkg/db');
+
 const express = require('express');
 const cars = require('./handlers/cars');
 
