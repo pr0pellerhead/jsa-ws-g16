@@ -5,6 +5,8 @@ const {
 } = require('../pkg/account/validate');
 const account = require('../pkg/account');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../pkg/config');
 
 const login = async (req, res) => {
     try {
@@ -22,7 +24,14 @@ const login = async (req, res) => {
                 error: 'Wrong password'
             };
         }
-        return res.status(200).send(acc);
+        let payload = {
+            full_name: acc.full_name,
+            email: acc.email,
+            id: acc._id,
+            exp: new Date().getTime() / 1000 + 7 * 24 * 60 * 60
+        };
+        let token = jwt.sign(payload, config.get('service').jwt_key);
+        return res.status(200).send({token});
     } catch(err) {
         console.log(err);
         return res.status(err.code).send(err.error);
@@ -49,7 +58,13 @@ const register = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-    return res.send('OK');
+    // req.user -> payload data from the token
+    let payload = {
+        ...req.user,
+        exp: new Date().getTime() / 1000 + 7 * 24 * 60 * 60
+    };
+    let token = jwt.sign(payload, config.get('service').jwt_key);
+    return res.send({token});
 };
 
 const forgotPassword = async (req, res) => {
@@ -67,3 +82,12 @@ module.exports = {
     forgotPassword,
     resetPassword
 };
+
+
+
+
+
+// JWT
+// ALGO.PAYLOAD.HASH + KEY
+// +.2|2|K.4
+
