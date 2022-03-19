@@ -1,3 +1,10 @@
+const posts = require('../pkg/blog');
+const { 
+    Post, 
+    PostPartial,
+    validate
+} = require("../pkg/blog/validation");
+
 const getAll = async (req, res) => {
     try {
         let ps = await posts.getAll(req.user.id);
@@ -56,7 +63,7 @@ const update = async (req, res) => {
 
 const updatePartial = async (req, res) => {
     try {
-        await validate(req.body, Post);
+        await validate(req.body, PostPartial);
         let data = {
             ...req.body,
             user_id: req.user.id
